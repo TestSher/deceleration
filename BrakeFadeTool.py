@@ -1,12 +1,14 @@
-#3.0{30/112020}
+#3.1{17/12/2020}
 #==============================================================================================
 from tkinter import*
 from tkinter import messagebox
 import tkinter.font as tkFont
-
-#import serial
+import tk_tools
+import math
+import PIL.Image, PIL.ImageTk
 import time
 import my_serial as ser
+import tkinter as tk
 
 root = Tk()
 
@@ -24,24 +26,59 @@ startim = PhotoImage(file = 'images/_    Initiate.png')
        text_file.write("Date :" + entry3.get()+ '\n')'''
 
 #==============================================================================================
-
+        
 def start():
-    
-    '''msg = ser.get_message(ser1)
-    if msg != None:
-        msg1 = msg[1:-1]
-        result = ser.parse_message(msg1)
-        print(result)
-        print(result[0])
 
-    root.after(50, start)'''
+    start = Toplevel()
+    start.geometry('490x490+800+400')
+    start.resizable(width=False,height=False)
+    
+
+    def go():
+          global resault,Txt
+          msg = ser.get_message(ser1)
+          if msg != None:
+              msg1 = msg[1:-1]
+              resault = ser.parse_message(msg1)
+              print(resault)
+              print(resault[0])
+
+          
+             
+          Txt = tk.Text(start,font='calibri 100', height=1, width=4)
+          Txt.place(x=108, y=150)
+          Txt.insert(tk.END, (resault[0]*9.80665))
+
+          
+
+          led = tk_tools.Led(start, size=50)
+          led.place(x=6, y=6)
+          if ((resault[0]<=0.356901)and(resault[0]>=0.254929)):
+                 led.to_green(on=True)
+
+          led = tk_tools.Led(start, size=50)
+          led.place(x=425, y=6)
+          if((resault[0]>=0.356901)or(resault[0]<=0.254929)): #0.356901=3.5ms^2 / 0.254929=2.5ms^2
+                 led.to_red(on=True)
+
+        
+          start.after(50, go)
+          
+
+    ser1 = ser.my_init_serial()
+    
+    button3=Button(start,text='Confirm!',command=go,relief="groove")
+    button3.place(x=215, y=400)
+
+#==============================================================================================
+
+   
 
 
 #==============================================================================================
 
 def sysdata():
     sysdata = Toplevel()
-    #photo = PhotoImage(file = "C:\\Users\\yaron\Desktop\\python examples\\matmon.ico")
     photo = PhotoImage(file = "images/matmon.ico")
     sysdata.iconphoto(False, photo)
     sysdata.geometry('600x400+650+400')
@@ -115,7 +152,7 @@ def opensettings():
     button3.place(x=20, y=300)
 
 
-def read_next_msg():
+'''def read_next_msg():
     msg = ser.get_message(ser1)
     if msg != None:
         msg1 = msg[1:-1]
@@ -123,10 +160,10 @@ def read_next_msg():
         print(result)
         print(result[0])
 
-    root.after(50, read_next_msg)
+    root.after(50, read_next_msg)'''
 
 #==============================================================================================
-ser1 = ser.my_init_serial()
+#ser1 = ser.my_init_serial()
 
 
 
@@ -134,9 +171,7 @@ photo = PhotoImage(file ="images/matmon.ico")
 root.iconphoto(False, photo)
 root.geometry('1252x834+320+150')
 C = Canvas(root, bg="blue", height=210, width=0)
-#img = PhotoImage(file = 'C:\\Users\\yaron\Desktop\\python examples\\bgmatmombigger.png')
 img = PhotoImage(file = 'images/bgmatmombigger.png')
-
 background_label = Label(root, image=img)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -195,17 +230,7 @@ root.attributes('-alpha',1)
 
 
 #==============================================================================================
-'''from tkinter import *
 
-sensor_value =300.4 #said sensor value
-master = Tk()
-x = sensor_value #assigned to variable x like you showed
-master.minsize(width=400, height=400)
-w = Label(master, text=x) #shows as text in the window
-w.pack() #organizes widgets in blocks before placing them in the parent.
-
-mainloop()'''
-#root.after(50,start)
-root.after(50, read_next_msg)
+ 
 root.mainloop()
 
