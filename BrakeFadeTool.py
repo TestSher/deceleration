@@ -1,4 +1,4 @@
-#3.1{17/12/2020}
+#3.2{23/12/2020}
 #==============================================================================================
 from tkinter import*
 from tkinter import messagebox
@@ -9,8 +9,8 @@ import PIL.Image, PIL.ImageTk
 import time
 import my_serial as ser
 import tkinter as tk
-
 root = Tk()
+global resault
 
 sysdim = PhotoImage(file = 'images/_System data.png')
 setim = PhotoImage(file = 'images/_   Settings.png')
@@ -18,63 +18,79 @@ conim = PhotoImage(file = 'images/small_confirm.png')
 startim = PhotoImage(file = 'images/_    Initiate.png')
 #==============================================================================================
 
-'''def Confirm():
-    label4["text"]=entry2.get()
-    label6["text"]=entry3.get()
-    with open("DataExp.txt", "w") as text_file:
-       text_file.write("vehicle category :" + entry2.get()+ '\n')
-       text_file.write("Date :" + entry3.get()+ '\n')'''
+'''def read_next_msg():
+    msg = ser.get_message(ser1)
+    if msg != None:
+        msg1 = msg[1:-1]
+        result = ser.parse_message(msg1)
+        #print(result)
+        print(result[0])
+        
+
+    root.after(50, read_next_msg)
+ser1 = ser.my_init_serial()'''
+
 
 #==============================================================================================
-        
+led1=None
+led=None
+Txt=None
+resault=0
+
 def start():
 
     start = Toplevel()
     start.geometry('490x490+800+400')
     start.resizable(width=False,height=False)
     
-
+  
     def go():
-          global resault,Txt
+          global resault
+          global Txt
+          global led
+          global led1
+          
           msg = ser.get_message(ser1)
           if msg != None:
               msg1 = msg[1:-1]
               resault = ser.parse_message(msg1)
               print(resault)
               print(resault[0])
-
-          
-             
-          Txt = tk.Text(start,font='calibri 100', height=1, width=4)
-          Txt.place(x=108, y=150)
+              
+          if Txt != None:
+              Txt.destroy()
+              
+          Txt = tk.Text(start,font='calibri 25', height=1, width=4)
+          Txt.place(x=208, y=350)
           Txt.insert(tk.END, (resault[0]*9.80665))
 
-          
+
+          if led != None:
+              led.destroy()
+              led1.destroy()
+              
 
           led = tk_tools.Led(start, size=50)
+          led1 = tk_tools.Led(start, size=50)
           led.place(x=6, y=6)
-          if ((resault[0]<=0.356901)and(resault[0]>=0.254929)):
+          led1.place(x=425, y=6)
+          if ((resault[0]<=0.356901)and(resault[0]>=0.254929)):#0.356901=3.5ms^2 / 0.254929=2.5ms^2
                  led.to_green(on=True)
-
-          led = tk_tools.Led(start, size=50)
+          else : led1.to_red(on=True)
+  
+          '''led = tk_tools.Led(start, size=50)
           led.place(x=425, y=6)
           if((resault[0]>=0.356901)or(resault[0]<=0.254929)): #0.356901=3.5ms^2 / 0.254929=2.5ms^2
-                 led.to_red(on=True)
+                 led.to_red(on=True)'''
 
-        
+
           start.after(50, go)
           
 
     ser1 = ser.my_init_serial()
     
     button3=Button(start,text='Confirm!',command=go,relief="groove")
-    button3.place(x=215, y=400)
-
-#==============================================================================================
-
-   
-
-
+    button3.place(x=215, y=415)
 #==============================================================================================
 
 def sysdata():
@@ -152,19 +168,7 @@ def opensettings():
     button3.place(x=20, y=300)
 
 
-'''def read_next_msg():
-    msg = ser.get_message(ser1)
-    if msg != None:
-        msg1 = msg[1:-1]
-        result = ser.parse_message(msg1)
-        print(result)
-        print(result[0])
-
-    root.after(50, read_next_msg)'''
-
 #==============================================================================================
-#ser1 = ser.my_init_serial()
-
 
 
 photo = PhotoImage(file ="images/matmon.ico")
@@ -231,6 +235,6 @@ root.attributes('-alpha',1)
 
 #==============================================================================================
 
- 
+#root.after(50, read_next_msg)
 root.mainloop()
 
