@@ -64,7 +64,7 @@ def get_message(ser):
 
 
 def my_init_serial():
-    ser = serial.Serial('COM3', 9600) #/dev/ttyACM0
+    ser = serial.Serial('/dev/ttyACM0', 9600)#ttyACM0
     # ser.flush()
     ser.reset_input_buffer()
     ser.reset_output_buffer()
